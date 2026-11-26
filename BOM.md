@@ -61,3 +61,19 @@ Prices are rough USD estimates (late 2026) and vary by vendor.
 No brick and no fuse: the expansion panel runs from the main module's brick and 5 A fuse. **One 60 W brick handles 6 Pi 3B+ total.**
 
 **Estimated total (expansion):** about $20–30 plus filament.
+
+## Single-Pi power board (optional; replaces one bare buck module)
+
+One board per Pi. References match `pcb/pi-power.kicad_sch`; `pcb/build.sh` also writes this as `pcb/out/pi-power-bom.csv` for the assembly quote.
+
+| Ref | Qty per board | Part | Footprint |
+|---|---|---|---|
+| — | 1 | PCB 40 × 23 mm, 2-layer, 1 oz copper is fine | — |
+| U1 | 1 | RECOM R-78B5.0-2.0 (5 V 2 A switching regulator) | SIP-3 THT |
+| C1 | 1 | 10 µF 25 V X7R (e.g. Murata GRM31CR71E106KA12L) | 1206 |
+| C2 | 1 | 22 µF 10 V X5R (e.g. Murata GRM31CR61A226KE19L) | 1206 |
+| R1 | 1 | 1 kΩ | 0805 |
+| D1 | 1 | Green LED | 0805 |
+| J1, J2 | 2 | Phoenix Contact 1715721 (MKDS 1,5/2-5,08) screw terminal | THT |
+
+**Rough cost:** about $10–15 in parts per board (the R-78B is most of it) plus PCBWay's board and assembly charges for a run of 5.
