@@ -53,6 +53,14 @@ Brick 12V ──► rear DC jack ──► 5A fuse ──► rocker ──► Wa
 
 ![Six-buck panel](docs/six-panel-preview.png)
 
+Wired up, with stand-in parts (`cad/six-assembly.scad`, a preview only, not for printing). Red is +12 V, black is GND, grey cables are the micro-USB and GS308 pigtails:
+
+![Six-buck panel, wired, from the rear](docs/six-assembly.png)
+
+![Six-buck panel, wired, top view (front panel at the bottom)](docs/six-assembly-top.png)
+
+- **Panel LED:** both 221-415 pairs are full, so the LED's + wire piggybacks on the rocker's output tab (1 kΩ resistor in the lead), and its − wire shares GND Wago A's jumper port in a twin ferrule. An illuminated 3-pin rocker avoids the extra wires entirely.
+
 ## Repo layout
 
 | Path | What |
@@ -60,6 +68,7 @@ Brick 12V ──► rear DC jack ──► 5A fuse ──► rocker ──► Wa
 | [`cad/rack-power-panel.scad`](cad/rack-power-panel.scad) | Parametric OpenSCAD model (panel + tray). Main module by default. |
 | [`cad/expansion-panel.scad`](cad/expansion-panel.scad) | Expansion module: includes the main model with `role = "expansion"` |
 | [`cad/six-panel.scad`](cad/six-panel.scad) | Six-buck panel: all six Pis in one 1U (`role = "six"`) |
+| [`cad/six-assembly.scad`](cad/six-assembly.scad) | Six-buck panel with stand-in parts and wiring (preview only) |
 | [`cad/render.sh`](cad/render.sh) | Renders every variant to STL + PNG and fails on warnings or a non-manifold mesh |
 | [`docs/layout.svg`](docs/layout.svg) | Front and top view with dimensions, drawn to scale |
 | [`BOM.md`](BOM.md) | Bill of materials |

@@ -24,4 +24,17 @@ for f in rack-power-panel expansion-panel six-panel; do
   run -o "out/$f.png" --render --imgsize=1400,900 --camera=127,60,10,55,0,215,520 \
     --colorscheme=Tomorrow "$f.scad" >/dev/null 2>&1
 done
+
+# Wired-up six-buck preview (stand-in parts, colour preview only, no STL).
+for view in "six-assembly.png --imgsize=1600,1000 --camera=127,50,5,50,0,200,330" \
+            "six-assembly-top.png --imgsize=1600,800 --projection=o --camera=127,48,0,0,0,0,300"; do
+  read -r png args <<<"$view"
+  # shellcheck disable=SC2086
+  log=$(run -o "out/$png" $args --colorscheme=Tomorrow six-assembly.scad 2>&1)
+  if grep -qE "WARNING|ERROR" <<<"$log"; then
+    echo "FAIL $png"; grep -E "WARNING|ERROR" <<<"$log"; status=1
+  else
+    echo "ok   six-assembly -> out/$png"
+  fi
+done
 exit $status
