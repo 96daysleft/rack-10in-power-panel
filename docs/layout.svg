@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="520" viewBox="0 0 680 520" font-family="Helvetica, Arial, sans-serif" role="img">
+<title>10-inch 1U power panel layout</title>
+<desc>Front view of a 254 mm by 44 mm rack panel with rack slots, rocker switch, LED and vents, and a top view of the 210 by 90 mm tray behind it holding a Wago connector, three buck converters, a fuse tie-down, a rear DC jack and four cable exit notches.</desc>
+<defs><marker id="a12" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#D85A30" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="a5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<style>
+.th{font-size:14px;font-weight:500;fill:#2C2C2A}
+.ts{font-size:12px;fill:#5F5E5A}
+.pt{font-size:14px;font-weight:500;fill:#3C3489}
+.pts{font-size:12px;fill:#3C3489}
+.gray{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:0.5}
+.comp{fill:#EEEDFE;stroke:#534AB7;stroke-width:0.5}
+.hole{fill:#FFFFFF;stroke:#5F5E5A;stroke-width:0.5}
+</style>
+<rect width="680" height="520" fill="#FFFFFF"/>
+<text class="th" x="48" y="36">Front view</text>
+<text class="ts" x="380" y="36" text-anchor="middle">254 mm wide, 1U (44 mm), 236.5 mm hole pitch</text>
+<line x1="48" y1="46" x2="632" y2="46" stroke="#5F5E5A" stroke-width="0.5"/>
+<line x1="48" y1="41" x2="48" y2="51" stroke="#5F5E5A" stroke-width="0.5"/>
+<line x1="632" y1="41" x2="632" y2="51" stroke="#5F5E5A" stroke-width="0.5"/>
+<rect class="gray" x="48" y="60" width="584" height="101" rx="3"/>
+<rect class="hole" x="56.6" y="66.5" width="23" height="15" rx="7.5"/>
+<rect class="hole" x="56.6" y="139.7" width="23" height="15" rx="7.5"/>
+<rect class="hole" x="600.6" y="66.5" width="23" height="15" rx="7.5"/>
+<rect class="hole" x="600.6" y="139.7" width="23" height="15" rx="7.5"/>
+<rect class="comp" x="129.2" y="95.5" width="44.6" height="30.1" rx="2"/>
+<circle class="comp" cx="209" cy="110.6" r="6"/>
+<g class="hole">
+<rect x="301" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="317.1" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="333.2" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="349.3" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="365.4" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="381.5" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="397.6" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="413.7" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="429.8" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="445.9" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="462" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="478.1" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="494.2" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="510.3" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="526.4" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="542.5" y="80.7" width="6.9" height="59.8" rx="3"/><rect x="558.6" y="80.7" width="6.9" height="59.8" rx="3"/>
+</g>
+<text class="ts" x="68" y="182" text-anchor="middle">Rack slot</text>
+<text class="ts" x="151.5" y="182" text-anchor="middle">Rocker 19.4×13.1</text>
+<text class="ts" x="230" y="182">LED 5 mm</text>
+<text class="ts" x="433" y="182" text-anchor="middle">Vents 3 mm @ 7 mm pitch</text>
+<text class="ts" x="612" y="182" text-anchor="middle">Rack slot</text>
+<text class="th" x="48" y="218">Top view</text>
+<text class="ts" x="120" y="218">front panel at top, rear wall at bottom, tray 210 × 90 mm</text>
+<rect class="gray" x="48" y="230" width="584" height="9.2"/>
+<rect x="98.6" y="239.2" width="483" height="207" fill="#FAFAF8" stroke="#888780" stroke-width="0.5"/>
+<rect class="gray" x="98.6" y="239.2" width="5.8" height="207"/>
+<rect class="gray" x="575.8" y="239.2" width="5.8" height="207"/>
+<g class="gray"><rect x="98.6" y="440.4" width="125.4" height="5.8"/><rect x="240" y="440.4" width="69.1" height="5.8"/><rect x="325.1" y="440.4" width="76" height="5.8"/><rect x="417.1" y="440.4" width="76" height="5.8"/><rect x="509.1" y="440.4" width="72.5" height="5.8"/></g>
+<rect class="comp" x="129.2" y="239.2" width="44.6" height="46" rx="2"/><text class="pts" x="151.5" y="266" text-anchor="middle">Switch</text>
+<rect class="comp" x="181.6" y="294.2" width="54.7" height="51" rx="3"/><text class="pt" x="209" y="324.5" text-anchor="middle">Wago</text>
+<rect class="comp" x="288.1" y="293" width="58" height="53.4" rx="3"/><text class="pt" x="317.1" y="324.5" text-anchor="middle">Buck 1</text>
+<rect class="comp" x="380.1" y="293" width="58" height="53.4" rx="3"/><text class="pt" x="409.1" y="324.5" text-anchor="middle">Buck 2</text>
+<rect class="comp" x="472.1" y="293" width="58" height="53.4" rx="3"/><text class="pt" x="501.1" y="324.5" text-anchor="middle">Buck 3</text>
+<rect x="140" y="363.4" width="9.2" height="4.6" fill="#5F5E5A"/>
+<rect x="140" y="390.8" width="9.2" height="4.6" fill="#5F5E5A"/>
+<text class="ts" x="158" y="383">Fuse tie-down</text>
+<circle class="comp" cx="144.6" cy="443.3" r="9"/>
+<g fill="none" stroke="#D85A30" stroke-width="1.5">
+<path d="M144.6 434 L144.6 286"/>
+<path d="M173.8 270 L195 270 L195 293"/>
+<path d="M236.3 312 L287 312"/>
+<path d="M236.3 330 L260 330 L260 362 L501.1 362 L501.1 347.5"/>
+<path d="M409.1 362 L409.1 347.5"/>
+<path d="M232 346 L232 456" marker-end="url(#a12)"/>
+</g>
+<g fill="none" stroke="#1D9E75" stroke-width="1.5">
+<path d="M317.1 347.5 L317.1 456" marker-end="url(#a5)"/>
+<path d="M409.1 367 L409.1 456" marker-end="url(#a5)"/>
+<path d="M501.1 367 L501.1 456" marker-end="url(#a5)"/>
+</g>
+<text class="ts" x="144.6" y="472" text-anchor="middle">DC in 12 mm</text>
+<text class="ts" x="232" y="472" text-anchor="middle">To GS308</text>
+<text class="ts" x="317.1" y="472" text-anchor="middle">To Pi 1</text>
+<text class="ts" x="409.1" y="472" text-anchor="middle">To Pi 2</text>
+<text class="ts" x="501.1" y="472" text-anchor="middle">To Pi 3</text>
+<line x1="200" y1="500" x2="228" y2="500" stroke="#D85A30" stroke-width="1.5"/>
+<text class="ts" x="236" y="504">12 V</text>
+<line x1="290" y1="500" x2="318" y2="500" stroke="#1D9E75" stroke-width="1.5"/>
+<text class="ts" x="326" y="504">5 V</text>
+<text class="ts" x="372" y="504">Gaps in rear wall = open-top 7 mm cable notches</text>
+</svg>
