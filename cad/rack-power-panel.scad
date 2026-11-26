@@ -1,6 +1,6 @@
 // 10-inch rack, 1U power panel for Raspberry Pi 3B+ nodes + Netgear GS308
 //
-// Two roles share this file (set `role`):
+// Three roles share this file (set `role`):
 //
 //   main      12 V brick -> rear DC jack -> 5 A fuse -> front rocker -> Wago 221-415 + 221-413
 //               -> GS308 barrel pigtail (12 V)
@@ -12,7 +12,12 @@
 //             No fuse: the main module's 5 A fuse protects the whole chain.
 //             One 60 W brick is good for 6 Pi 3B+ total (main + one expansion).
 //
-// expansion-panel.scad is a wrapper that includes this file with role = "expansion".
+//   six       All six Pis in one panel: main's input (jack, fuse, rocker), no link,
+//               bucks in two rows of three, and 4x Wago 221-415 (two per rail,
+//               joined by a short jumper) -> GS308 + 6x buck -> Pi 1-6
+//
+// expansion-panel.scad and six-panel.scad are wrappers that include this file
+// with role = "expansion" / "six".
 //
 // Print with the tray floor on the bed (front panel stands up), PETG preferred.
 // All dimensions in mm. Measure your actual parts and adjust the parameters.
@@ -20,7 +25,7 @@
 $fn = 48;
 
 /* [Module] */
-role             = "main"; // [main, expansion]
+role             = "main"; // [main, expansion, six]
 expansion_rocker = true;   // expansion only: local on/off switch for its Pis
 
 /* [Rack] */
@@ -74,9 +79,21 @@ zip_slot    = [4, 2];     // zip-tie slot through the floor
 fuse_pos    = [20, 62];   // main: inline fuse holder tie-down
 relief_y    = 80;         // strain-relief zip ties in front of link notches
 
-is_main = role == "main";
+/* [Six-buck panel] (role = "six") */
+buck6_x     = [105, 145, 185];   // columns, shifted right to make room for 4 Wagos
+buck6_y     = [32, 68];          // two rows; zip slots between the rows stay clear
+wago6_pos   = [[46, 32], [72, 32], [46, 64], [72, 64]]; // front pair +12V, rear pair GND
+pi6_notch_x = [97, 113, 137, 153, 177, 193]; // one rear notch per Pi cable
+
+is_main   = role == "main";
+is_six    = role == "six";
+has_input = is_main || is_six;  // rear DC jack, fuse tie-down, rocker
+buck_pos  = is_six ? [for (y = buck6_y, x = buck6_x) [x, y]] : [for (x = buck_x) [x, buck_y]];
+wagos     = is_six ? wago6_pos : [wago_pos];  // all 221-415
 tray_x0 = (panel_w - tray_w) / 2;
-notch_x = is_main ? concat([link_x, gs308_x], buck_x) : concat([in_x], buck_x);
+notch_x = is_main ? concat([link_x, gs308_x], buck_x)
+        : is_six  ? concat([gs308_x], pi6_notch_x)
+        :           concat([in_x], buck_x);
 
 // ---------- front panel ----------
 module panel_2d() {
@@ -88,7 +105,7 @@ module panel_2d() {
                 hull() for (dx = [-(slot_l - slot_w) / 2, (slot_l - slot_w) / 2])
                     translate([dx, 0]) circle(d = slot_w);
         // rocker switch
-        if (is_main || expansion_rocker)
+        if (has_input || expansion_rocker)
             translate([rocker_x - rocker[0] / 2, panel_h / 2 - rocker[1] / 2]) square(rocker);
         // power LED
         if (led_d > 0) translate([led_x, panel_h / 2]) circle(d = led_d);
@@ -132,8 +149,8 @@ module tray() {
             cube([wall_t, tray_d, wall_h]);                                     // left wall
             translate([tray_w - wall_t, 0, 0]) cube([wall_t, tray_d, wall_h]);  // right wall
             translate([0, tray_d - wall_t, 0]) cube([tray_w, wall_t, wall_h]);  // rear wall
-            for (x = buck_x) translate([x, buck_y, 0]) pocket(buck_in);
-            translate([wago_pos[0], wago_pos[1], 0]) pocket(wago_in);
+            for (b = buck_pos) translate([b[0], b[1], 0]) pocket(buck_in);
+            for (w = wagos) translate([w[0], w[1], 0]) pocket(wago_in);
             if (is_main) translate([wago2_pos[0], wago2_pos[1], 0]) pocket(wago2_in);
         }
         // cable exit notches (open from the top)
@@ -141,15 +158,17 @@ module tray() {
             translate([x - notch_w / 2, tray_d - wall_t - 1, wall_h - notch_depth])
                 cube([notch_w, wall_t + 2, notch_depth + 1]);
         // zip-tie slots
-        for (x = buck_x) zip_pair([x, buck_y], buck_in);
-        zip_pair(wago_pos, wago_in);
-        if (is_main) {
+        for (b = buck_pos) zip_pair(b, buck_in);
+        for (w = wagos) zip_pair(w, wago_in);
+        if (has_input) {
             // rear DC input jack
             translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
-            zip_pair(wago2_pos, wago2_in);
             for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
+        }
+        if (is_main) {
+            zip_pair(wago2_pos, wago2_in);
             relief_pair(link_x);
-        } else {
+        } else if (!is_six) {
             relief_pair(in_x);
         }
     }

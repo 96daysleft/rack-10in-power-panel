@@ -61,3 +61,17 @@ Prices are rough USD estimates (late 2026) and vary by vendor.
 No brick and no fuse: the expansion panel runs from the main module's brick and 5 A fuse. **One 60 W brick handles 6 Pi 3B+ total.**
 
 **Estimated total (expansion):** about $20–30 plus filament.
+
+## Six-buck panel (Pi 1–6 in one panel, instead of main + expansion)
+
+Start from the main module list above, then change these:
+
+| Change | Part | Notes | ~Cost |
+|---|---|---|---|
+| 3 → 6 | 12 V→5 V buck converter, ≥3 A | One per Pi | +$3–15 |
+| 3 → 6 | Micro-USB male power pigtails | 10–15 cm, 20 AWG preferred | +$5 |
+| 2 → 4 | Wago 221-415 | Two per rail (+12 V and GND), each pair joined by a short 18 AWG jumper | +$5 |
+| drop | Wago 221-413 and XT30 pigtail | No link-out | −$4 |
+| — | Printed panel + tray (`cad/six-panel.scad`) | PETG recommended (six bucks in one tray) | — |
+
+**Estimated total (six-buck panel):** about $55–75 plus filament. That's less than main + expansion, which need a second print, an XT30 link and more Wagos.
