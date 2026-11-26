@@ -12,7 +12,9 @@ run() {
     DISPLAY="${DISPLAY:-}" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-}" "$@"
 }
 
-mkdir -p out
+# Start the fab files clean so no other board's Gerbers end up in the zip.
+rm -rf out/gerbers
+mkdir -p out/gerbers
 run /usr/bin/python3 generate.py
 
 echo "== ERC"
@@ -40,5 +42,5 @@ run kicad-cli sch export bom -o out/$NAME-bom.csv \
   --fields 'Reference,Value,Footprint,MPN,${QUANTITY}' --labels 'Designator,Value,Footprint,MPN,Qty' \
   --group-by 'Value,Footprint,MPN' --ref-range-delimiter '' $NAME.kicad_sch
 run kicad-cli pcb export pos --format csv --units mm --side both --use-drill-file-origin -o out/$NAME-pos.csv $NAME.kicad_pcb
-(cd out && rm -f $NAME-gerbers.zip && zip -qj $NAME-gerbers.zip gerbers/*)
+(cd out && rm -f $NAME-gerbers.zip && zip -qj $NAME-gerbers.zip gerbers/$NAME-* gerbers/$NAME.drl)
 echo "done: see pcb/out/ (gerbers zip, BOM and placement CSVs for the fab)"
