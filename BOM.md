@@ -83,6 +83,12 @@ References match `pcb/carrier.kicad_sch`. **M** = fit on a main board, **E** = f
 | J10–J15 | — | Wire pads for buck IN/OUT (no part) | — | | |
 | R2–R4 | 3 | 1 kΩ | 0805 | ✓ | ✓ |
 | D3–D5 | 3 | Green LED | 0805 | ✓ | ✓ |
+| R6–R8 | 3 | 10 mΩ 1 W current-sense resistor (always fit: it carries the 5 V) | 2512 | ✓ | ✓ |
+| R5 | 1 | 2.2 kΩ (front-panel LED) | 0805 | ✓ | ✓ |
+| J8 | 1 | JST-PH B2B-PH-K header + a 5 mm LED on a PH lead (pin 1 = anode) | THT | ✓ | ✓ |
+| U1 | 1 | INA3221AIRGVR current monitor (optional; best assembled by the fab) | VQFN-16 | opt | opt |
+| C2 | 1 | 100 nF (optional, with U1) | 0805 | opt | opt |
+| J9 | 1 | 1×4 2.54 mm pin header, I2C GND/3V3/SDA/SCL (optional, with U1) | THT | opt | opt |
 | — | 3 | Buck modules (same as above) | — | ✓ | ✓ |
 | — | 4 | M3 × 6 screws + M3 heat-set inserts (tray standoffs) | — | ✓ | ✓ |
 
