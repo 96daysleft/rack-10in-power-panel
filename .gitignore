@@ -9,3 +9,4 @@ pcb/out/
 fp-info-cache
 _autosave-*
 *.kicad_prl
+cad/out/

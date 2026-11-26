@@ -88,17 +88,17 @@ The model is parametric. Measure your parts and change the values at the top of 
 4. `rocker` ([19.4, 13.1]): the cutout for your rocker switch.
 5. `tray_w` (210): this must fit between your rack rails.
 
-To export an STL:
+To export STLs and previews of all three variants to `cad/out/`:
 
 ```bash
-openscad -o rack-power-panel.stl cad/rack-power-panel.scad
+cad/render.sh
 ```
 
-```bash
-openscad -o expansion-panel.stl cad/expansion-panel.scad
-```
+It finds `openscad` on your PATH or an OpenSCAD AppImage in `~/AppImages` (or set `OPENSCAD=/path/to/openscad`). It fails if OpenSCAD reports a warning, an error or a non-manifold mesh.
 
-Both files share every dimension, so a change in `rack-power-panel.scad` carries over to the expansion panel. To change just the expansion panel, override the parameter in `expansion-panel.scad` below the `include`.
+![Main, expansion and PCB variants](docs/model-preview.png)
+
+All three files share every dimension, so a change in `rack-power-panel.scad` carries over to the others. To change just one variant, override the parameter in its wrapper file below the `include`.
 
 The drawing in `docs/layout.svg` shows the main module before the link-out was added.
 
@@ -122,4 +122,4 @@ The drawing in `docs/layout.svg` shows the main module before the link-out was a
 
 ## Status
 
-The model has not been test-printed or checked in OpenSCAD yet. Expect to adjust it after a test print.
+All three model variants render cleanly in OpenSCAD 2021.01 (no warnings, manifold meshes). Nothing has been test-printed yet, so expect to adjust the model after a test print.
