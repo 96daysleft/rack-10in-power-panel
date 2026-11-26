@@ -61,3 +61,28 @@ Prices are rough USD estimates (late 2026) and vary by vendor.
 No brick and no fuse: the expansion panel runs from the main module's brick and 5 A fuse. **One 60 W brick handles 6 Pi 3B+ total.**
 
 **Estimated total (expansion):** about $20–30 plus filament.
+
+## Carrier PCB, lite v0.3 (replaces Wago, fuse holder and loose wiring)
+
+References match `pcb/carrier.kicad_sch`. **M** = fit on a main board, **E** = fit on an expansion board. Everything is through-hole or 0805, so it can all be hand-soldered.
+
+| Ref | Qty | Part | Footprint | M | E |
+|---|---|---|---|---|---|
+| — | 1 | PCB 160 × 70 mm, 2-layer, 2 oz copper (Gerbers from `pcb/build.sh`) | — | ✓ | ✓ |
+| J1 | 1 | CUI PJ-063AH 5.5×2.1 barrel jack | THT | ✓ | |
+| F1 | 1 | Keystone 3568 mini blade fuse holder + 5 A mini blade fuse | THT | ✓ | |
+| J2 | 1 | JST-VH B2P-VH header (rocker lead); bridge it if there's no rocker | THT | ✓ | |
+| J3 | 1 | AMASS XT30PW-F (right-angle female) | THT | ✓ (link out) | ✓ (input) |
+| J4 | 1 | Phoenix MKDS 1,5/2-5,08 screw terminal (GS308) | THT | ✓ | |
+| J5–J7 | 3 | Phoenix MKDS 1,5/2-5,08 screw terminal (Pi 5 V) | THT | ✓ | ✓ |
+| J10–J15 | — | Wire pads for buck IN/OUT (no part) | — | | |
+| R2–R4 | 3 | 1 kΩ | 0805 | ✓ | ✓ |
+| D3–D5 | 3 | Green LED | 0805 | ✓ | ✓ |
+| R5 | 1 | 2.2 kΩ (front-panel LED) | 0805 | ✓ | ✓ |
+| J8 | 1 | JST-PH B2B-PH-K header + a 5 mm LED on a PH lead (pin 1 = anode) | THT | ✓ | ✓ |
+| — | 3 | Buck modules (same as above) | — | ✓ | ✓ |
+| — | 4 | M3 × 6 screws + M3 heat-set inserts (tray standoffs) | — | ✓ | ✓ |
+
+The PCB build drops the Wago connectors, the inline fuse holder and the panel-mount DC jack from the hand-wired list. **Rough cost:** about $10–15 in parts per board plus ~$10–20 for 5 PCBs (+ shipping).
+
+The v0.2 board (commit `7bdb18c`) added reverse-polarity protection, a TVS diode, a bulk capacitor and an optional INA3221 current monitor; see that commit if you want them back.

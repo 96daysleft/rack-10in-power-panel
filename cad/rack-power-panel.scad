@@ -20,8 +20,11 @@
 $fn = 48;
 
 /* [Module] */
-role             = "main"; // [main, expansion]
+role             = "main"; // [main, expansion, pcb]
 expansion_rocker = true;   // expansion only: local on/off switch for its Pis
+// role = "pcb": tray for the carrier board in pcb/ (replaces Wago, fuse and loose bucks).
+// The tray gets 4 standoffs, and the rear wall drops to a low lip so the board's
+// connectors are reachable from behind.
 
 /* [Rack] */
 panel_w   = 254;    // 10" front panel width
@@ -74,8 +77,21 @@ zip_slot    = [4, 2];     // zip-tie slot through the floor
 fuse_pos    = [20, 62];   // main: inline fuse holder tie-down
 relief_y    = 80;         // strain-relief zip ties in front of link notches
 
+/* [Carrier PCB] (role = "pcb"; must match pcb/generate.py) */
+pcb_size      = [160, 70];
+pcb_holes     = [[4, 4], [156, 4], [4, 66], [156, 66]]; // from the board's front-left corner
+pcb_rear_gap  = 1.5;  // board rear edge to rear wall
+standoff_h    = 6;    // clearance under the board for THT leads
+standoff_d    = 7;
+standoff_hole = 4.0;  // M3 heat-set insert (use 2.5 to self-tap an M3 screw)
+lip_h         = 3;    // rear lip height above the floor
+
 is_main = role == "main";
+is_pcb  = role == "pcb";
 tray_x0 = (panel_w - tray_w) / 2;
+pcb_x0  = (tray_w - pcb_size[0]) / 2;                         // tray coords
+pcb_y0  = tray_d - wall_t - pcb_rear_gap - pcb_size[1];
+rear_h  = is_pcb ? floor_t + lip_h : wall_h;
 notch_x = is_main ? concat([link_x, gs308_x], buck_x) : concat([in_x], buck_x);
 
 // ---------- front panel ----------
@@ -88,7 +104,7 @@ module panel_2d() {
                 hull() for (dx = [-(slot_l - slot_w) / 2, (slot_l - slot_w) / 2])
                     translate([dx, 0]) circle(d = slot_w);
         // rocker switch
-        if (is_main || expansion_rocker)
+        if (is_main || is_pcb || expansion_rocker)
             translate([rocker_x - rocker[0] / 2, panel_h / 2 - rocker[1] / 2]) square(rocker);
         // power LED
         if (led_d > 0) translate([led_x, panel_h / 2]) circle(d = led_d);
@@ -131,25 +147,36 @@ module tray() {
             cube([tray_w, tray_d, floor_t]);
             cube([wall_t, tray_d, wall_h]);                                     // left wall
             translate([tray_w - wall_t, 0, 0]) cube([wall_t, tray_d, wall_h]);  // right wall
-            translate([0, tray_d - wall_t, 0]) cube([tray_w, wall_t, wall_h]);  // rear wall
-            for (x = buck_x) translate([x, buck_y, 0]) pocket(buck_in);
-            translate([wago_pos[0], wago_pos[1], 0]) pocket(wago_in);
-            if (is_main) translate([wago2_pos[0], wago2_pos[1], 0]) pocket(wago2_in);
+            translate([0, tray_d - wall_t, 0]) cube([tray_w, wall_t, rear_h]);  // rear wall / lip
+            if (is_pcb) {
+                for (h = pcb_holes) translate([pcb_x0 + h[0], pcb_y0 + h[1], 0])
+                    cylinder(d = standoff_d, h = floor_t + standoff_h);
+            } else {
+                for (x = buck_x) translate([x, buck_y, 0]) pocket(buck_in);
+                translate([wago_pos[0], wago_pos[1], 0]) pocket(wago_in);
+                if (is_main) translate([wago2_pos[0], wago2_pos[1], 0]) pocket(wago2_in);
+            }
         }
-        // cable exit notches (open from the top)
-        for (x = notch_x)
-            translate([x - notch_w / 2, tray_d - wall_t - 1, wall_h - notch_depth])
-                cube([notch_w, wall_t + 2, notch_depth + 1]);
-        // zip-tie slots
-        for (x = buck_x) zip_pair([x, buck_y], buck_in);
-        zip_pair(wago_pos, wago_in);
+        if (is_pcb) {
+            // insert / screw holes in the standoffs
+            for (h = pcb_holes) translate([pcb_x0 + h[0], pcb_y0 + h[1], floor_t])
+                cylinder(d = standoff_hole, h = standoff_h + 1);
+        } else {
+            // cable exit notches (open from the top)
+            for (x = notch_x)
+                translate([x - notch_w / 2, tray_d - wall_t - 1, wall_h - notch_depth])
+                    cube([notch_w, wall_t + 2, notch_depth + 1]);
+            // zip-tie slots
+            for (x = buck_x) zip_pair([x, buck_y], buck_in);
+            zip_pair(wago_pos, wago_in);
+        }
         if (is_main) {
             // rear DC input jack
             translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
             zip_pair(wago2_pos, wago2_in);
             for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
             relief_pair(link_x);
-        } else {
+        } else if (!is_pcb) {
             relief_pair(in_x);
         }
     }
