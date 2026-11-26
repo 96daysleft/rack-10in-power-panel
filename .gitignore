@@ -2,3 +2,11 @@
 *.3mf
 *.gcode
 cad/out/
+
+# KiCad build output and temp files
+pcb/out/
+*.lck
+*-backups/
+fp-info-cache
+_autosave-*
+*.kicad_prl

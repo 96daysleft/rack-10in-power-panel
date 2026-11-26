@@ -14,7 +14,7 @@ run() { env -i HOME="$HOME" PATH=/usr/local/bin:/usr/bin:/bin DISPLAY="${DISPLAY
 
 mkdir -p out
 status=0
-for f in rack-power-panel expansion-panel six-panel; do
+for f in rack-power-panel expansion-panel six-panel six-pcb-panel; do
   log=$(run -o "out/$f.stl" "$f.scad" 2>&1)
   if grep -qE "WARNING|ERROR" <<<"$log" || ! grep -qE "Simple:\s+yes" <<<"$log"; then
     echo "FAIL $f"; grep -E "WARNING|ERROR|Simple:" <<<"$log"; status=1
@@ -25,17 +25,19 @@ for f in rack-power-panel expansion-panel six-panel; do
     --colorscheme=Tomorrow "$f.scad" >/dev/null 2>&1
 done
 
-# Wired-up six-buck preview (stand-in parts, colour preview only, no STL).
-for view in "six-assembly.png --imgsize=1600,1000 --camera=127,50,5,50,0,200,330" \
-            "six-assembly-top.png --imgsize=1600,800 --projection=o --camera=127,48,0,0,0,0,300" \
-            "six-assembly-front.png --imgsize=1600,900 --camera=127,30,15,65,0,20,330"; do
-  read -r png args <<<"$view"
-  # shellcheck disable=SC2086
-  log=$(run -o "out/$png" $args --colorscheme=Tomorrow six-assembly.scad 2>&1)
-  if grep -qE "WARNING|ERROR" <<<"$log"; then
-    echo "FAIL $png"; grep -E "WARNING|ERROR" <<<"$log"; status=1
-  else
-    echo "ok   six-assembly -> out/$png"
-  fi
+# Wired-up previews (stand-in parts, colour preview only, no STL): rear, top and front views.
+for asm in six-assembly six-pcb-assembly; do
+  for view in "$asm.png --imgsize=1600,1000 --camera=127,50,5,50,0,200,330" \
+              "$asm-top.png --imgsize=1600,800 --projection=o --camera=127,48,0,0,0,0,300" \
+              "$asm-front.png --imgsize=1600,900 --camera=127,30,15,65,0,20,330"; do
+    read -r png args <<<"$view"
+    # shellcheck disable=SC2086
+    log=$(run -o "out/$png" $args --colorscheme=Tomorrow "$asm.scad" 2>&1)
+    if grep -qE "WARNING|ERROR" <<<"$log"; then
+      echo "FAIL $png"; grep -E "WARNING|ERROR" <<<"$log"; status=1
+    else
+      echo "ok   $asm -> out/$png"
+    fi
+  done
 done
 exit $status

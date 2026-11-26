@@ -1,6 +1,6 @@
 // 10-inch rack, 1U power panel for Raspberry Pi 3B+ nodes + Netgear GS308
 //
-// Three roles share this file (set `role`):
+// Four roles share this file (set `role`):
 //
 //   main      12 V brick -> rear DC jack -> 5 A fuse -> front rocker -> Wago 221-415 + 221-413
 //               -> GS308 barrel pigtail (12 V)
@@ -16,8 +16,12 @@
 //               bucks in two rows of three, and 4x Wago 221-415 (two per rail,
 //               joined by a short jumper) -> GS308 + 6x buck -> Pi 1-6
 //
-// expansion-panel.scad and six-panel.scad are wrappers that include this file
-// with role = "expansion" / "six".
+//   six-pcb   Six outputs on the assembled carrier board in pcb/ (six-carrier):
+//               front-panel jack, rocker and LED wire into the board's screw
+//               terminals; the tray has 4 standoffs instead of pockets
+//
+// expansion-panel.scad, six-panel.scad and six-pcb-panel.scad are wrappers that
+// include this file with role = "expansion" / "six" / "six-pcb".
 //
 // Print with the tray floor on the bed (front panel stands up), PETG preferred.
 // All dimensions in mm. Measure your actual parts and adjust the parameters.
@@ -25,7 +29,7 @@
 $fn = 48;
 
 /* [Module] */
-role             = "main"; // [main, expansion, six]
+role             = "main"; // [main, expansion, six, six-pcb]
 expansion_rocker = true;   // expansion only: local on/off switch for its Pis
 
 /* [Rack] */
@@ -87,16 +91,25 @@ relief_y    = 80;         // strain-relief zip ties in front of link notches
 buck6_x     = [105, 145, 185];   // columns, shifted right to make room for 4 Wagos
 buck6_y     = [32, 68];          // two rows; zip slots between the rows stay clear
 wago6_pos   = [[46, 32], [72, 32], [46, 64], [72, 64]]; // front pair +12V, rear pair GND
-pi6_notch_x = [97, 113, 137, 153, 177, 193]; // one rear notch per Pi cable
+pi6_notch_x = [97, 113, 137, 153, 177, 193]; // one rear notch per Pi cable (six and six-pcb)
 
-is_main   = role == "main";
-is_six    = role == "six";
-has_input = is_main || is_six;  // rear DC jack, fuse tie-down, rocker
-buck_pos  = is_six ? [for (y = buck6_y, x = buck6_x) [x, y]] : [for (x = buck_x) [x, buck_y]];
-wagos     = is_six ? wago6_pos : [wago_pos];  // all 221-415
+/* [Six-output carrier board] (role = "six-pcb"; must match pcb/generate.py) */
+pcb6_holes    = [[47, 5], [201, 5], [47, 83], [201, 83]]; // M3 holes, tray coordinates
+standoff_h    = 6;    // clearance under the board for THT leads
+standoff_d    = 7;
+standoff_hole = 4.0;  // M3 heat-set insert (use 2.5 to self-tap an M3 screw)
+vent_jack_gap = 4;    // keep vents this far from a front jack
+
+is_main    = role == "main";
+is_six     = role == "six";
+is_six_pcb = role == "six-pcb";
+has_input  = is_main || is_six || is_six_pcb;  // DC jack, rocker (and a fuse: loose or on the board)
+buck_pos   = is_six ? [for (y = buck6_y, x = buck6_x) [x, y]]
+           : is_six_pcb ? [] : [for (x = buck_x) [x, buck_y]];
+wagos      = is_six ? wago6_pos : is_six_pcb ? [] : [wago_pos];  // all 221-415
 tray_x0 = (panel_w - tray_w) / 2;
 notch_x = is_main ? concat([link_x, gs308_x], buck_x)
-        : is_six  ? concat([gs308_x], pi6_notch_x)
+        : is_six || is_six_pcb ? concat([gs308_x], pi6_notch_x)
         :           concat([in_x], buck_x);
 
 // ---------- front panel ----------
@@ -116,8 +129,10 @@ module panel_2d() {
         // DC input jack (front option)
         if (has_input && jack_side == "front") translate([jack_front_x, panel_h / 2]) circle(d = jack_d);
         // vents
+        front_jack = has_input && jack_side == "front";
         for (x = [vent_x0 : vent_pitch : vent_x1 - vent_w])
-            translate([x, (panel_h - vent_h) / 2]) square([vent_w, vent_h]);
+            if (!(front_jack && abs(x + vent_w / 2 - jack_front_x) < jack_d / 2 + vent_w / 2 + vent_jack_gap))
+                translate([x, (panel_h - vent_h) / 2]) square([vent_w, vent_h]);
     }
 }
 
@@ -158,7 +173,10 @@ module tray() {
             for (b = buck_pos) translate([b[0], b[1], 0]) pocket(buck_in);
             for (w = wagos) translate([w[0], w[1], 0]) pocket(wago_in);
             if (is_main) translate([wago2_pos[0], wago2_pos[1], 0]) pocket(wago2_in);
+            if (is_six_pcb) for (h = pcb6_holes) translate([h[0], h[1], 0]) cylinder(d = standoff_d, h = floor_t + standoff_h);
         }
+        if (is_six_pcb)  // heat-set insert holes (blind, from the top)
+            for (h = pcb6_holes) translate([h[0], h[1], 1]) cylinder(d = standoff_hole, h = floor_t + standoff_h);
         // cable exit notches (open from the top)
         for (x = notch_x)
             translate([x - notch_w / 2, tray_d - wall_t - 1, wall_h - notch_depth])
@@ -170,12 +188,13 @@ module tray() {
             // DC input jack in the rear wall (rear option)
             if (jack_side == "rear")
                 translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
-            for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
+            if (!is_six_pcb)  // inline fuse tie-down (the carrier board has its own fuse)
+                for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
         }
         if (is_main) {
             zip_pair(wago2_pos, wago2_in);
             relief_pair(link_x);
-        } else if (!is_six) {
+        } else if (!is_six && !is_six_pcb) {
             relief_pair(in_x);
         }
     }

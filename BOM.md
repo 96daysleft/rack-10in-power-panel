@@ -75,3 +75,23 @@ Start from the main module list above, then change these:
 | — | Printed panel + tray (`cad/six-panel.scad`) | PETG recommended (six bucks in one tray) | — |
 
 **Estimated total (six-buck panel):** about $55–75 plus filament. That's less than main + expansion, which need a second print, an XT30 link and more Wagos.
+
+## Six-output carrier PCB (fully assembled; replaces the bucks, Wagos and internal wiring)
+
+References match `pcb/six-carrier.kicad_sch`. `pcb/build.sh` also writes this list as `pcb/out/six-carrier-bom.csv` for the assembly quote.
+
+| Ref | Qty | Part | Footprint |
+|---|---|---|---|
+| — | 1 | PCB 160 × 84 mm, 2-layer, 2 oz copper | — |
+| U1–U6 | 6 | RECOM R-78B5.0-2.0 (5 V 2 A switching regulator) | SIP-3 THT |
+| C1–C6 | 6 | 10 µF 25 V X7R (e.g. Murata GRM31CR71E106KA12L) | 1206 |
+| C7–C12 | 6 | 22 µF 10 V X5R (e.g. Murata GRM31CR61A226KE19L) | 1206 |
+| R1 | 1 | 2.2 kΩ (panel LED) | 0805 |
+| R2–R7 | 6 | 1 kΩ (status LEDs) | 0805 |
+| D1–D6 | 6 | Green LED | 0805 |
+| F1 | 1 | Keystone 3568 mini blade fuse holder + 5 A mini blade fuse | THT |
+| J1–J10 | 10 | Phoenix Contact 1715721 (MKDS 1,5/2-5,08) screw terminal | THT |
+
+**Off-board:** a pre-wired 5.5×2.1 panel-mount jack (front panel), the rocker with 2 leads, a 5 mm LED with 2 leads, the GS308 barrel pigtail, six micro-USB pigtails, 4 × M3 × 6 screws and 4 × M3 heat-set inserts for the standoffs, and the printed panel + tray (`cad/six-pcb-panel.scad`).
+
+**Rough cost:** about $60–90 in parts per board (the six R-78Bs are most of it) plus PCBWay's board and assembly charges. Get their quote for a run of 5.
