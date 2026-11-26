@@ -38,7 +38,13 @@ module rocker_body() {
     color("red") translate([rk_x - rocker[0] / 2 + 1, -4.6, panel_h / 2 - rocker[1] / 2 + 1]) cube([rocker[0] - 2, 1, rocker[1] - 2]);
 }
 
-module jack_body() {
+front_jack = jack_side == "front";
+jf = [jack_front_x - tray_x0, 0, panel_h / 2];  // front jack centre at the panel's inner face
+module jack_body() if (front_jack) {
+    color("silver") translate(jf + [0, 0.5, 0]) rotate([-90, 0, 0]) cylinder(d = 10, h = 11);
+    color([0.1, 0.1, 0.1]) translate(jf - [0, panel_t, 0]) rotate([90, 0, 0]) cylinder(d = 10, h = 16);   // brick plug
+    wire([jf - [0, panel_t + 16, 0], jf - [0, panel_t + 26, 14]], BLK, 4);                                  // brick cable
+} else {
     color("silver") translate([jack_x, tray_d - wall_t, jack_z]) rotate([90, 0, 0]) cylinder(d = 10, h = 11);
     color([0.1, 0.1, 0.1]) translate([jack_x, tray_d + 0.1, jack_z]) rotate([-90, 0, 0]) cylinder(d = 10, h = 16);  // brick plug
     wire([[jack_x, tray_d + 16, jack_z], [jack_x, tray_d + 30, jack_z - 6]], BLK, 4);                            // brick cable
@@ -64,10 +70,15 @@ blk_src = [port(gA, 3, 1),  port(gA, 4, 1),  port(gB, 1, 1),  port(gB, 2, 1),  p
 
 module wiring() {
     // input: jack + -> fuse -> rocker -> +12V Wago A port 0; jack - -> GND Wago A port 0
-    wire([[jack_x - 2, tray_d - 13, jack_z + 2], [fuse_pos[0], fuse_pos[1] + 13, 8]]);
+    if (front_jack) {  // jack lugs -> back over the top of the Wagos to the fuse / GND Wago
+        wire([jf + [-2, 12, 2], [jf[0] - 2, 16, 22], [40, 45, 18], [24, fuse_pos[1] + 15, 12], [fuse_pos[0], fuse_pos[1] + 13, 8]]);
+        wire([jf + [2, 12, -2], [jf[0] + 2, 16, 20], [52, 50, 16], [port(gA, 0, 1)[0], 80, 10], port(gA, 0, 1)], BLK);
+    } else {
+        wire([[jack_x - 2, tray_d - 13, jack_z + 2], [fuse_pos[0], fuse_pos[1] + 13, 8]]);
+        wire([[jack_x + 2, tray_d - 13, jack_z - 2], [30, 81, 9], [port(gA, 0, 1)[0], 80, 9], port(gA, 0, 1)], BLK);
+    }
     wire([[fuse_pos[0], fuse_pos[1] - 13, 8], [fuse_pos[0], 30, 12], [rk_x - 4, 24, panel_h / 2], [rk_x - 4, 21.5, panel_h / 2]]);
     wire([[rk_x + 4, 21.5, panel_h / 2], [rk_x + 4, 26, 16], [port(wA, 0, -1)[0], 17, 10], out_pt(port(wA, 0, -1), -1, 1, 7), port(wA, 0, -1)]);
-    wire([[jack_x + 2, tray_d - 13, jack_z - 2], [30, 81, 9], [port(gA, 0, 1)[0], 80, 9], port(gA, 0, 1)], BLK);
     // panel LED: no free Wago port, so + piggybacks on the rocker's output tab (1k resistor in
     // the lead) and - shares GND Wago A's jumper port in a twin ferrule
     wire([[rk_x + 4, 21.5, panel_h / 2 + 2], [led_x - tray_x0, 8, panel_h / 2 + 2], [led_x - tray_x0, 5, panel_h / 2]], RED, 1.2);

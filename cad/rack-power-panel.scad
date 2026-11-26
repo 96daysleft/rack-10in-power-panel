@@ -55,8 +55,12 @@ vent_w     = 3;
 vent_pitch = 7;
 vent_h     = 26;
 
+/* [DC input jack] (main and six) */
+jack_side    = "rear"; // [rear, front] rear wall, or front panel between the LED and the vents
+jack_front_x = 90;     // front: centre, x from the panel's left edge
+
 /* [Rear wall cutouts] (x from the tray's left edge) */
-jack_d      = 12.2;   // main: panel-mount 5.5x2.1 jack, M12 body (8.2 for M8 type)
+jack_d      = 12.2;   // panel-mount 5.5x2.1 jack, M12 body (8.2 for M8 type)
 jack_x      = 20;
 jack_z      = 13;     // centre height; leaves room for the nut above the floor
 link_x      = 40;     // main: 12 V link-out pigtail notch
@@ -109,6 +113,8 @@ module panel_2d() {
             translate([rocker_x - rocker[0] / 2, panel_h / 2 - rocker[1] / 2]) square(rocker);
         // power LED
         if (led_d > 0) translate([led_x, panel_h / 2]) circle(d = led_d);
+        // DC input jack (front option)
+        if (has_input && jack_side == "front") translate([jack_front_x, panel_h / 2]) circle(d = jack_d);
         // vents
         for (x = [vent_x0 : vent_pitch : vent_x1 - vent_w])
             translate([x, (panel_h - vent_h) / 2]) square([vent_w, vent_h]);
@@ -161,8 +167,9 @@ module tray() {
         for (b = buck_pos) zip_pair(b, buck_in);
         for (w = wagos) zip_pair(w, wago_in);
         if (has_input) {
-            // rear DC input jack
-            translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
+            // DC input jack in the rear wall (rear option)
+            if (jack_side == "rear")
+                translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
             for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
         }
         if (is_main) {

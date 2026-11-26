@@ -38,10 +38,10 @@ Panel 2: (optional rocker) ──► Wago 221-415 ──► Buck 4–6 ──►
 
 ### Six-buck panel (Pi 1–6 in one 1U)
 
-All six Pis and the GS308 can also run from **one** panel instead of main + expansion. It has the main module's input (rear jack, 5 A fuse, rocker), no link-out, and the bucks in two rows of three:
+All six Pis and the GS308 can also run from **one** panel instead of main + expansion. It has the main module's input (DC jack, 5 A fuse, rocker), no link-out, and the bucks in two rows of three. The DC jack is on the **front panel**, between the LED and the vents, so the brick plugs in from the front:
 
 ```
-Brick 12V ──► rear DC jack ──► 5A fuse ──► rocker ──► Wago 221-415 ══ jumper ══ Wago 221-415   (+12V; GND the same)
+Brick 12V ──► front DC jack ──► 5A fuse ──► rocker ──► Wago 221-415 ══ jumper ══ Wago 221-415   (+12V; GND the same)
                                                         ├──► GS308         ├──► Buck 3–6 ──► Pi 3–6
                                                         └──► Buck 1–2 ──► Pi 1–2
 ```
@@ -58,6 +58,8 @@ Wired up, with stand-in parts (`cad/six-assembly.scad`, a preview only, not for 
 ![Six-buck panel, wired, from the rear](docs/six-assembly.png)
 
 ![Six-buck panel, wired, top view (front panel at the bottom)](docs/six-assembly-top.png)
+
+![Six-buck panel, wired, front: rocker, LED, DC jack](docs/six-assembly-front.png)
 
 - **Panel LED:** both 221-415 pairs are full, so the LED's + wire piggybacks on the rocker's output tab (1 kΩ resistor in the lead), and its − wire shares GND Wago A's jumper port in a twin ferrule. An illuminated 3-pin rocker avoids the extra wires entirely.
 
@@ -79,7 +81,7 @@ The model is parametric. Measure your parts and change the values at the top of 
 
 1. `ear_pitch` (236.5): your rack's hole spacing, center to center.
 2. `buck_in` ([22, 20]): the pocket size for your buck module.
-3. `jack_d` (12.2): use 8.2 for an M8-body DC jack.
+3. `jack_d` (12.2): use 8.2 for an M8-body DC jack. `jack_side` (`"rear"` or `"front"`) puts it in the rear wall or on the front panel at `jack_front_x`. The main panel uses the rear; the six-buck panel sets `"front"` in `six-panel.scad`.
 4. `rocker` ([19.4, 13.1]): the cutout for your rocker switch.
 5. `tray_w` (210): this must fit between your rack rails.
 
@@ -111,7 +113,7 @@ The drawing in `docs/layout.svg` shows the main module before the link-out was a
 
 | | Main | Expansion | Six-buck |
 |---|---|---|---|
-| Input | 5.5×2.1 DC jack (rear wall) | XT30 pigtail through a rear notch | 5.5×2.1 DC jack (rear wall) |
+| Input | 5.5×2.1 DC jack (rear wall) | XT30 pigtail through a rear notch | 5.5×2.1 DC jack (front panel) |
 | Fuse | 5 A inline, with tie-down | none | 5 A inline, with tie-down |
 | Rocker | yes | optional (`expansion_rocker`) | yes |
 | Bucks | 3, one row | 3, one row | 6, two rows of three |

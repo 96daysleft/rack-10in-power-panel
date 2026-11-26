@@ -27,7 +27,8 @@ done
 
 # Wired-up six-buck preview (stand-in parts, colour preview only, no STL).
 for view in "six-assembly.png --imgsize=1600,1000 --camera=127,50,5,50,0,200,330" \
-            "six-assembly-top.png --imgsize=1600,800 --projection=o --camera=127,48,0,0,0,0,300"; do
+            "six-assembly-top.png --imgsize=1600,800 --projection=o --camera=127,48,0,0,0,0,300" \
+            "six-assembly-front.png --imgsize=1600,900 --camera=127,30,15,65,0,20,330"; do
   read -r png args <<<"$view"
   # shellcheck disable=SC2086
   log=$(run -o "out/$png" $args --colorscheme=Tomorrow six-assembly.scad 2>&1)
