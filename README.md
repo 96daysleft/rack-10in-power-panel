@@ -49,20 +49,17 @@ Panel 2: (optional rocker) ──► Wago 221-415 ──► Buck 4–6 ──►
 
 ## Carrier PCB (optional)
 
-A 160 × 70 mm, 2-layer board that replaces the Wago, the inline fuse holder and most of the loose wiring. The buck modules stay off-the-shelf and solder to wire pads, so there's no power-supply design involved.
+A 160 × 70 mm, 2-layer board that replaces the Wago, the inline fuse holder and most of the loose wiring. The buck modules stay off-the-shelf and solder to wire pads, so there's no power-supply design involved. This is the **lite** board (v0.3): every part is through-hole or 0805, so it's hand-solderable.
 
 ![Carrier PCB render](docs/pcb-3d.png)
 
-- **Input:** 5.5×2.1 jack → AOD4185 P-FET for reverse-polarity protection (with a 15 V gate zener) → 5 A mini blade fuse → SMBJ15CA TVS diode + 470 µF bulk capacitor → rocker header (JST-VH; bridge it if you have no rocker).
+- **Input:** 5.5×2.1 jack → 5 A mini blade fuse → rocker header (JST-VH; bridge it if you have no rocker). There's no reverse-polarity protection, so use a known center-positive brick.
 - **12 V out:** an XT30 link (board-mount female; **pad 2 = +**, matching the AMASS silk) and a screw terminal for the GS308.
-- **3 buck slots:** IN+/IN− and OUT+/OUT− wire pads (0.5 mm², fits 20 AWG) around a marked area for the module, a 10 mΩ shunt resistor, a 5 V screw terminal per Pi, and a green status LED.
+- **3 buck slots:** IN+/IN− and OUT+/OUT− wire pads (0.5 mm², fits 20 AWG) around a marked area for the module, a 5 V screw terminal per Pi, and a green status LED.
 - **Front-panel LED:** a JST-PH header (J8, pin 1 = anode) fed from the switched 12 V through a 2.2 kΩ resistor (about 4.5 mA), so it follows the rocker. Use any 5 mm LED; the resistor is on the board.
-- **Optional current monitor:** an INA3221 (U1) measures each Pi's 5 V current across its shunt. The shunts are **always fitted** (25 mV drop at 2.5 A), so U1, C2 and J9 can be added later. The sense pairs run on the bottom layer.
-  - J9 pinout (Qwiic order): **GND, 3V3, SDA, SCL**. Wire it to a Pi's GPIO pins 6 (GND), 1 (3V3), 3 (SDA) and 5 (SCL). The INA3221 runs from that Pi's 3.3 V, so the logic levels match, and the Pi's own pull-ups serve the bus.
-  - Address **0x40** (A0 tied to GND). Linux has an `ina3221` hwmon driver: `echo ina3221 0x40 | sudo tee /sys/bus/i2c/devices/i2c-1/new_device`, then read `/sys/class/hwmon/*/curr*_input`. Check the driver's shunt setting matches 10 mΩ.
-  - The QFN package is hard to hand-solder. Have the board house assemble U1, or skip it.
 - **GND** is a full pour on the bottom layer. Power traces on top are 2.5 mm (12 V) and 1.5 mm (5 V). Order 2 oz copper for margin.
-- **Expansion board:** the same PCB. Fit J3 (XT30) as the 12 V input and leave out J1, Q1, R1, D2 and F1. Bridge J2 (or fit a rocker); the main panel's fuse protects the link.
+- **Expansion board:** the same PCB. Fit J3 (XT30) as the 12 V input and leave out J1, F1 and J2. The XT30 feeds the 12 V bus directly, after the fuse and rocker positions, so the main panel's fuse and rocker control the expansion board too. A local rocker on an expansion board would have to go inline in the XT30 lead.
+- **Dropped from v0.2** (still in git history at commit `7bdb18c`): the reverse-polarity MOSFET, TVS diode, bulk capacitor, current-sense shunts and the optional INA3221 current monitor.
 
 Schematic: [`docs/pcb-schematic.pdf`](docs/pcb-schematic.pdf). It's generated, so pins carry net labels rather than drawn wires.
 
@@ -76,7 +73,7 @@ pcb/build.sh
 
 It regenerates everything, runs **ERC** and **DRC with schematic parity** (the build fails on any error), then exports a schematic PDF, a top-layer SVG, a 3D render, Gerbers and a drill file to `pcb/out/`. It needs KiCad 8 or newer; it was built with 10.0.8.
 
-**Current status (v0.2):** ERC 0 violations; DRC 0 errors, 0 unconnected, 0 parity issues. Three cosmetic silkscreen warnings remain: the barrel jack's outline overhangs the board edge on purpose, and D4's reference overlaps its own outline. Not yet fabricated.
+**Current status (v0.3 lite):** ERC 0 violations; DRC 0 errors, 0 unconnected, 0 parity issues. Three cosmetic silkscreen warnings remain (the build lists them): the barrel jack's outline overhangs the board edge on purpose, and D4's reference overlaps its own outline. Not yet fabricated.
 
 The 3D render shows bare pads unless KiCad's 3D model library is installed (`sudo apt install kicad-packages3d`).
 

@@ -28,142 +28,77 @@ BUCK_X = [185.0, 210.0, 235.0]  # left pad x of each buck slot column
 # --------------------------------------------------------------------------
 PARTS = {
     "J1": ("Connector:Barrel_Jack", "12V IN 5.5x2.1", "Connector_BarrelJack:BarrelJack_CUI_PJ-063AH_Horizontal", (115, 158, 0), (40, 60)),
-    "Q1": ("Device:Q_PMOS_GDS", "AOD4185 (P-ch 40V, rev. polarity)", "Package_TO_SOT_SMD:TO-252-2", (125, 146, 0), (80, 55)),
-    "R1": ("Device:R", "10k", "Resistor_SMD:R_0805_2012Metric", (122, 140, 0), (70, 80)),
-    "D2": ("Device:D_Zener", "MMSZ5245B 15V", "Diode_SMD:D_SOD-123", (116, 144, 0), (95, 80)),
-    "F1": ("Device:Fuse", "5A mini blade", "Fuse:Fuseholder_Blade_Mini_Keystone_3568", (106, 128, 0), (125, 55)),
-    "D1": ("Device:D_TVS", "SMBJ15CA", "Diode_SMD:D_SMB", (124, 124, 0), (150, 70)),
-    "C1": ("Device:C_Polarized", "470uF 25V", "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm", (130, 132, 0), (170, 70)),
-    "J2": ("Connector_Generic:Conn_01x02", "ROCKER (bridge if none)", "Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", (140, 108, 0), (200, 55)),
-    "J3": ("Connector_Generic:Conn_01x02", "XT30 LINK", "Connector_AMASS:AMASS_XT30PW-F_1x02_P2.50mm_Horizontal", (150, 155, 180), (240, 40)),
-    "J4": ("Connector_Generic:Conn_01x02", "GS308 12V", "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal", (160, 162, 0), (240, 70)),
+    "F1": ("Device:Fuse", "5A mini blade", "Fuse:Fuseholder_Blade_Mini_Keystone_3568", (106, 128, 0), (90, 55)),
+    "J2": ("Connector_Generic:Conn_01x02", "ROCKER (bridge if none)", "Connector_JST:JST_VH_B2P-VH_1x02_P3.96mm_Vertical", (140, 108, 0), (140, 55)),
+    "J3": ("Connector_Generic:Conn_01x02", "XT30 LINK", "Connector_AMASS:AMASS_XT30PW-F_1x02_P2.50mm_Horizontal", (150, 155, 180), (200, 40)),
+    "J4": ("Connector_Generic:Conn_01x02", "GS308 12V", "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal", (160, 162, 0), (200, 70)),
     "H1": ("Mechanical:MountingHole", "M3", "MountingHole:MountingHole_3.2mm_M3", (104, 104, 0), (40, 160)),
     "H2": ("Mechanical:MountingHole", "M3", "MountingHole:MountingHole_3.2mm_M3", (256, 104, 0), (55, 160)),
     "H3": ("Mechanical:MountingHole", "M3", "MountingHole:MountingHole_3.2mm_M3", (104, 166, 0), (70, 160)),
     "H4": ("Mechanical:MountingHole", "M3", "MountingHole:MountingHole_3.2mm_M3", (256, 166, 0), (85, 160)),
     # Front-panel power LED (follows the rocker: fed from the switched +12V)
-    "R5": ("Device:R", "2k2", "Resistor_SMD:R_0805_2012Metric", (152, 108, 0), (180, 80)),
-    "J8": ("Connector_Generic:Conn_01x02", "PANEL LED (1=A 2=K)", "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical", (158.5, 108, 0), (200, 80)),
-    # Optional 3-channel current monitor; the 10 mOhm shunts are always fitted
-    "U1": ("Power_Management:INA3221", "INA3221 (optional)", "Package_DFN_QFN:Texas_RGV0016A_VQFN-16-1EP_4x4mm_P0.65mm_EP2.1x2.1mm", (210, 107, 180), (235, 150)),
-    "C2": ("Device:C", "100nF (optional)", "Capacitor_SMD:C_0805_2012Metric", (216, 104, 0), (210, 165)),
-    "J9": ("Connector_Generic:Conn_01x04", "I2C GND/3V3/SDA/SCL (optional)", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", (232, 104, 270), (270, 150)),
+    "R5": ("Device:R", "2k2", "Resistor_SMD:R_0805_2012Metric", (152, 108, 0), (240, 55)),
+    "J8": ("Connector_Generic:Conn_01x02", "PANEL LED (1=A 2=K)", "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical", (158.5, 108, 0), (260, 55)),
     "#FLG01": ("power:PWR_FLAG", "PWR_FLAG", None, None, (110, 175)),
-    "#FLG02": ("power:PWR_FLAG", "PWR_FLAG", None, None, (125, 175)),
 }
-OPTIONAL = {"U1", "C2", "J9"}  # marked DNP in the BOM/schematic; fit for current monitoring
+OPTIONAL = set()  # nothing optional on the lite board
+NO_BOM = {"H1", "H2", "H3", "H4"}  # footprints flagged "exclude from BOM"; buck wire pads added below
 NETS = {
-    "VIN": [("J1", "1"), ("Q1", "2")],
-    "VREV": [("Q1", "3"), ("F1", "1"), ("D2", "1")],
-    "GATE": [("Q1", "1"), ("R1", "1"), ("D2", "2")],
-    "+12V_F": [("F1", "2"), ("D1", "1"), ("C1", "1"), ("J2", "1")],
+    "VIN": [("J1", "1"), ("F1", "1")],
+    "+12V_F": [("F1", "2"), ("J2", "1")],
     "+12V": [("J2", "2"), ("J3", "2"), ("J4", "1"), ("R5", "1")],
     "PANEL_LED": [("R5", "2"), ("J8", "1")],
-    "+3V3_I2C": [("U1", "4"), ("U1", "16"), ("C2", "1"), ("J9", "2"), ("#FLG02", "1")],
-    "SDA": [("U1", "7"), ("J9", "3")],
-    "SCL": [("U1", "6"), ("J9", "4")],
-    "GND": [("J1", "2"), ("R1", "2"), ("D1", "2"), ("C1", "2"), ("J3", "1"), ("J4", "2"), ("J8", "2"),
-            ("U1", "3"), ("U1", "5"), ("U1", "17"), ("C2", "2"), ("J9", "1"), ("#FLG01", "1")],
+    "GND": [("J1", "2"), ("J3", "1"), ("J4", "2"), ("J8", "2"), ("#FLG01", "1")],
 }
-NO_CONNECT = [("U1", "8"), ("U1", "9"), ("U1", "10"), ("U1", "13")]  # WARNING, CRITICAL, PV, TC
-INA_IN = {1: ("12", "11"), 2: ("15", "14"), 3: ("2", "1")}  # channel -> (IN+, IN-) pin numbers
-# Three identical buck slots: IN pads, OUT pads, shunt, output terminal, LED + resistor.
+NO_CONNECT = []
+# Three identical buck slots: IN pads, OUT pads, output terminal, LED + resistor.
 for i, x in enumerate(BUCK_X):
     n = i + 1
     jin, jout, jterm = f"J{10 + 2 * i}", f"J{11 + 2 * i}", f"J{5 + i}"
-    r, d, rs = f"R{2 + i}", f"D{3 + i}", f"R{6 + i}"
+    r, d = f"R{2 + i}", f"D{3 + i}"
     sx = 40 + 60 * i
     PARTS[jin] = ("Connector_Generic:Conn_01x02", f"BUCK{n} IN", "Connector_Wire:SolderWire-0.5sqmm_1x02_P4.6mm_D0.9mm_OD2.1mm", (x, 120, 0), (sx, 110))
     PARTS[jout] = ("Connector_Generic:Conn_01x02", f"BUCK{n} OUT", "Connector_Wire:SolderWire-0.5sqmm_1x02_P4.6mm_D0.9mm_OD2.1mm", (x, 144, 0), (sx + 15, 110))
     PARTS[jterm] = ("Connector_Generic:Conn_01x02", f"PI{n} 5V", "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal", (x, 162, 0), (sx + 30, 110))
-    PARTS[rs] = ("Device:R", "10mR 1W shunt", "Resistor_SMD:R_2512_6332Metric", (x, 150, 90), (sx + 45, 110))
     PARTS[r] = ("Device:R", "1k", "Resistor_SMD:R_0805_2012Metric", (x + 8, 155, 0), (sx + 10, 135))
     PARTS[d] = ("Device:LED", "green", "LED_SMD:LED_0805_2012Metric", (x + 12, 155, 180), (sx + 25, 135))
-    ip, im = INA_IN[n]
+    NO_BOM.update({jin, jout})
     NETS["+12V"].append((jin, "1"))
-    NETS[f"BUCK{n}_OUT"] = [(jout, "1"), (rs, "2"), ("U1", ip)]
-    NETS[f"+5V_PI{n}"] = [(rs, "1"), (jterm, "1"), (r, "1"), ("U1", im)]
+    NETS[f"+5V_PI{n}"] = [(jout, "1"), (jterm, "1"), (r, "1")]
     NETS[f"LED{n}"] = [(r, "2"), (d, "2")]
     NETS["GND"] += [(jin, "2"), (jout, "2"), (jterm, "2"), (d, "1")]
 
 # --------------------------------------------------------------------------
-# Routing (F.Cu). Each route: (net, width_mm, [points]); a point is (x, y),
+# Routing (F.Cu). Each route: (net, width_mm, [points][, "B"]); a point is (x, y),
 # ("pad", ref, number) or ("via", x, y). Pads resolve to the nearest pad with
 # that number. GND is a B.Cu pour; SMD GND pads drop to it through vias.
 # --------------------------------------------------------------------------
 W12, W5, WS, WSN = 2.5, 1.5, 0.5, 0.25
 ROUTES = [
-    ("VIN", W12, [("pad", "J1", "1"), (128, 158), ("pad", "Q1", "2")]),
-    ("VREV", W12, [("pad", "Q1", "3"), (106, 148.28), ("pad", "F1", "1")]),
-    ("VREV", WS, [("pad", "D2", "1"), (114.35, 148.28)]),
-    ("VREV", W12, [(106, 128), (106, 131.4)]),          # fuse clip: join its two pads
+    ("VIN", W12, [("pad", "J1", "1"), (106, 158), ("pad", "F1", "1")]),
+    ("VIN", W12, [(106, 128), (106, 131.4)]),            # fuse clip: join its two pads
     ("+12V_F", W12, [(115.92, 128), (115.92, 131.4)]),  # fuse clip: join its two pads
-    ("GATE", WS, [("pad", "Q1", "1"), (117.65, 143.72), ("pad", "D2", "2")]),
-    ("GATE", WS, [("pad", "Q1", "1"), (119.96, 140), ("pad", "R1", "1")]),
-    ("GND", WS, [("pad", "R1", "2"), ("via", 124.6, 140)]),
-    ("+12V_F", W12, [("pad", "F1", "2"), (115.92, 120), (121.85, 120), (130, 120), (140, 120), ("pad", "J2", "1")]),
-    ("+12V_F", W12, [("pad", "D1", "1"), (121.85, 120)]),
-    ("+12V_F", W12, [("pad", "C1", "1"), (130, 120)]),
-    ("GND", 1.0, [("pad", "D1", "2"), ("via", 126.15, 127)]),
+    ("+12V_F", W12, [("pad", "F1", "2"), (115.92, 120), (140, 120), ("pad", "J2", "1")]),
     ("+12V", W12, [("pad", "J2", "2"), (143.96, 114), (145, 114), (151.05, 114), (160, 114)] + [(x, 114) for x in BUCK_X]),
     ("+12V", WS, [(151.05, 114), ("pad", "R5", "1")]),
     ("PANEL_LED", WS, [("pad", "R5", "2"), ("pad", "J8", "1")]),
     ("+12V", W12, [(145, 114), ("pad", "J3", "2")]),  # XT30 pad 2 is + per the AMASS silk
     ("+12V", W12, [(160, 114), ("pad", "J4", "1")]),
 ]
-# INA3221 (U1 at 210,107 rotated 180): pins 11/12 face channel 1 (left),
-# 14/15 face channel 2 (down, across the 12 V bus via B.Cu), 1/2 face channel 3 (right).
-ROUTES += [
-    # channel 1 sense pair: B.Cu from the shunt vias, F.Cu into pins 12 (IN+1) / 11 (IN-1)
-    ("BUCK1_OUT", WSN, [(181.5, 147.037), (181.5, 107.975), ("via", 202.5, 107.975)], "B"),
-    ("BUCK1_OUT", WSN, [(202.5, 107.975), ("pad", "U1", "12")]),
-    ("+5V_PI1", WSN, [(179.5, 152.963), (179.5, 107.325), ("via", 204.5, 107.325)], "B"),
-    ("+5V_PI1", WSN, [(204.5, 107.325), ("pad", "U1", "11")]),
-    # channel 2: pins 15 (IN+2) / 14 (IN-2) drop to vias just below the chip
-    ("BUCK2_OUT", WSN, [("pad", "U1", "15"), (210.325, 109.7), ("via", 211.0, 110.4)]),
-    ("BUCK2_OUT", WSN, [(211.0, 110.4), (211.0, 111.4), (206.5, 111.4), (206.5, 147.037)], "B"),
-    ("+5V_PI2", WSN, [("pad", "U1", "14"), (209.675, 109.7), ("via", 209.0, 110.4)]),
-    ("+5V_PI2", WSN, [(209.0, 110.4), (204.5, 110.4), (204.5, 152.963)], "B"),
-    # channel 3: pins 2 (IN+3) / 1 (IN-3) run right on F.Cu, then B.Cu down to the shunt
-    ("BUCK3_OUT", WSN, [("pad", "U1", "2"), ("via", 217.5, 107.325)]),
-    ("BUCK3_OUT", WSN, [(217.5, 107.325), (231.5, 107.325), (231.5, 147.037)], "B"),
-    ("+5V_PI3", WSN, [("pad", "U1", "1"), ("via", 219.5, 107.975)]),
-    ("+5V_PI3", WSN, [(219.5, 107.975), (229.5, 107.975), (229.5, 152.963)], "B"),
-    # supply, address and ground
-    ("GND", WSN, [("pad", "U1", "3"), (210.6, 106.675)]),                    # GND pin -> exposed pad
-    # exposed pad -> B.Cu ground pour (0.3 mm holes: standard 2-layer fab minimum)
-    ("GND", WSN, [("via", 209.5, 106.5)]), ("GND", WSN, [("via", 210.5, 106.5)]),
-    ("GND", WSN, [("via", 209.5, 107.5)]), ("GND", WSN, [("via", 210.5, 107.5)]),
-    ("GND", WSN, [("pad", "U1", "5"), (210.975, 106.2)]),                    # A0 -> GND: address 0x40
-    ("+3V3_I2C", 0.4, [("pad", "J9", "2"), (229.46, 106.4), (215.05, 106.4), ("pad", "C2", "1")]),
-    ("+3V3_I2C", WSN, [("pad", "C2", "1"), (213.6, 104), ("via", 213.6, 105.2), (212.8, 106.025), ("pad", "U1", "4")]),
-    ("+3V3_I2C", WSN, [("pad", "U1", "16"), (210.975, 109.5), ("via", 211.9, 110.2)]),   # VPU
-    ("+3V3_I2C", WSN, [(211.9, 110.2), (213.6, 110.2), (213.6, 105.2)], "B"),
-    ("GND", WSN, [("pad", "C2", "2"), ("via", 217.2, 105.4)]),
-    # I2C to the header (J9 pin 3 = SDA, pin 4 = SCL)
-    ("SDA", WSN, [("pad", "U1", "7"), (209.675, 101.6), (226.92, 101.6), ("pad", "J9", "3")]),
-    ("SCL", WSN, [("pad", "U1", "6"), (210.325, 102.5), (224.38, 102.5), ("pad", "J9", "4")]),
-]
 for i, x in enumerate(BUCK_X):
     n = i + 1
     jin, jout, jterm, r, d = f"J{10 + 2 * i}", f"J{11 + 2 * i}", f"J{5 + i}", f"R{2 + i}", f"D{3 + i}"
     ROUTES += [
         ("+12V", W12, [(x, 114), ("pad", jin, "1")]),
-        (f"BUCK{n}_OUT", W5, [("pad", jout, "1"), ("pad", f"R{6 + i}", "2")]),
-        (f"+5V_PI{n}", W5, [("pad", f"R{6 + i}", "1"), (x, 155), ("pad", jterm, "1")]),
-        # Kelvin taps from the shunt pads to vias; the sense pair then runs on B.Cu
-        (f"BUCK{n}_OUT", WSN, [("pad", f"R{6 + i}", "2"), ("via", x - 3.5, 147.037)]),
-        (f"+5V_PI{n}", WSN, [("pad", f"R{6 + i}", "1"), ("via", x - 5.5, 152.963)]),
+        (f"+5V_PI{n}", W5, [("pad", jout, "1"), (x, 155), ("pad", jterm, "1")]),
         (f"+5V_PI{n}", WS, [(x, 155), ("pad", r, "1")]),
         (f"LED{n}", WS, [("pad", r, "2"), ("pad", d, "2")]),
         ("GND", WS, [("pad", d, "1"), ("via", x + 14.8, 155)]),
     ]
 
 SILK = [  # (text, x, y, size_mm)
-    ("rack-10in-power-panel carrier v0.2", 180, 103.5, 1.2),
+    ("rack-10in-power-panel carrier v0.3 lite", 182, 103.5, 1.2),
     ("PANEL LED", 159.5, 104.8, 0.8),
-    ("INA3221 (opt)", 210, 112.0, 0.8),
-    ("SCL", 224.38, 106.6, 0.8), ("SDA", 226.92, 106.6, 0.8), ("3V3", 229.46, 106.6, 0.8), ("GND", 232.0, 106.6, 0.8),
     ("12V IN", 115, 154, 1.0),
     ("5A", 111, 135, 1.0),
     ("ROCKER", 142, 102.5, 1.0),
@@ -295,7 +230,7 @@ def write_schematic(root_uuid, sym_uuids):
         virtual = fp is None  # power flags: schematic only
         yn = lambda b: "yes" if b else "no"
         node = ["symbol", ["lib_id", Q(lib_id)], ["at", str(sx), str(sy), "0"], ["unit", "1"],
-                ["in_bom", yn(not virtual)], ["on_board", yn(not virtual)], ["dnp", yn(ref in OPTIONAL)],
+                ["in_bom", yn(not virtual and ref not in NO_BOM)], ["on_board", yn(not virtual)], ["dnp", yn(ref in OPTIONAL)],
                 ["uuid", Q(sym_uuids[ref])],
                 prop("Reference", ref, 3.81, -2.54, hide=virtual), prop("Value", value, 3.81, 2.54),
                 prop("Footprint", fp or "", 0, 5.08, hide=True), prop("Datasheet", "~", 0, 7.62, hide=True)]
@@ -323,7 +258,7 @@ def write_schematic(root_uuid, sym_uuids):
 
     sch = ["kicad_sch", ["version", "20230121"], ["generator", "eeschema"], ["uuid", Q(root_uuid)],
            ["paper", "A3"],
-           ["title_block", ["title", Q("Rack power carrier")], ["rev", Q("0.2")],
+           ["title_block", ["title", Q("Rack power carrier (lite)")], ["rev", Q("0.3")],
             ["comment", "1", Q("Generated by pcb/generate.py - edit the script, not this file")]],
            ["lib_symbols"] + lib_syms] + items + [["sheet_instances", ["path", Q("/"), ["page", Q("1")]]]]
     with open(os.path.join(HERE, NAME + ".kicad_sch"), "w") as f:
@@ -341,7 +276,7 @@ def write_pcb(root_uuid, sym_uuids):
     board = pcbnew.BOARD()
     nets = {}
     for name in NETS:
-        ni = pcbnew.NETINFO_ITEM(board, name)
+        ni = pcbnew.NETINFO_ITEM(board, "/" + name)  # match the schematic's local-label net names
         board.Add(ni); nets[name] = ni
     pin_net = {(ref, pin): net for net, members in NETS.items() for ref, pin in members}
 

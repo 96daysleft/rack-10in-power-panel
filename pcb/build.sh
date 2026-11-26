@@ -21,6 +21,9 @@ run kicad-cli sch erc --severity-all --exit-code-violations -o out/erc.rpt carri
 echo "== DRC (with schematic parity)"
 run kicad-cli pcb drc --schematic-parity --severity-error --exit-code-violations -o out/drc.rpt carrier.kicad_pcb \
   || { cat out/drc.rpt; exit 1; }
+# Warnings don't fail the build, but list them so they're never hidden.
+run kicad-cli pcb drc --schematic-parity --severity-all -o out/drc-all.rpt carrier.kicad_pcb >/dev/null || true
+echo "   warnings:"; grep -E '^\*\* Found|^\[' out/drc-all.rpt | sed 's/^/   /'
 
 echo "== Exports"
 run kicad-cli sch export pdf -o out/carrier-schematic.pdf carrier.kicad_sch
