@@ -61,6 +61,18 @@ pcb/build.sh
 
 It runs ERC and DRC with schematic parity (the build fails on any error and lists every warning), then writes to `pcb/out/` the files for a PCBWay assembly order: `pi-power-gerbers.zip`, `pi-power-bom.csv` (designators, values, part numbers) and `pi-power-pos.csv` (placement, origin at the board's bottom-left corner), plus a schematic PDF and renders.
 
+#### Ordering assembled boards from PCBWay
+
+The three files above are all PCBWay needs to make the board **and** fit every part. You choose assembly on the order page:
+
+1. Choose **PCB Assembly** (not plain PCB) and **Turnkey**, so PCBWay buys the parts.
+2. Upload `pi-power-gerbers.zip` for the bare board: 2 layers, 40 × 23 mm, 1.6 mm thick, quantity 5.
+3. Upload `pi-power-bom.csv` as the BOM and `pi-power-pos.csv` as the centroid / pick-and-place file. Set the assembly quantity (for example 5).
+4. Assembly side: **top only**. Part types: **SMD and through-hole**. C1, C2, R1 and D1 are surface-mount; U1, J1 and J2 are through-hole (hand-soldered, charged per joint).
+5. PCBWay reviews the files and sends a quote. Check that it lists the RECOM R-78B5.0-2.0 and the Phoenix 1715721 terminals, or approve their substitutes, before paying.
+
+The boards arrive ready to screw into the tray: nothing to solder.
+
 **Current status (v1.0):** ERC 0 violations; DRC 0 errors, 0 warnings, 0 unconnected, 0 parity issues. Not yet fabricated. Before ordering, confirm the R-78B and terminal stock and part numbers in PCBWay's quote, and that the terminals' wire entry faces the bottom edge.
 
 ## Repo layout
