@@ -74,9 +74,27 @@ zip_slot    = [4, 2];     // zip-tie slot through the floor
 fuse_pos    = [20, 62];   // main: inline fuse holder tie-down
 relief_y    = 80;         // strain-relief zip ties in front of link notches
 
+/* [Buck mounting] */
+buck_mount    = "module"; // [module, pi-power] bare buck modules in pockets, or pcb/pi-power boards on standoffs
+// pi-power boards (must match pcb/generate.py): terminals face the rear, mounting holes at the front
+pp_size       = [40, 23];
+pp_x          = [90, 135, 180];          // board centres; wider pitch than bare bucks
+pp_holes      = [[3.5, 3.5], [36.5, 3.5]]; // M3 holes, from the board's front-left corner
+pp_posts      = [[2, 21], [38, 21]];      // plain support posts under the rear corners
+pp_standoff_h = 4;                        // clearance for the through-hole leads
+pp_standoff_d = 6.5;
+pp_insert_d   = 4.0;                      // M3 heat-set insert (2.5 to self-tap an M3 screw)
+pp_out_dx     = 8.5;                      // 5V OUT terminal centre, right of the board centre
+
 is_main = role == "main";
+is_pp   = buck_mount == "pi-power";
 tray_x0 = (panel_w - tray_w) / 2;
-notch_x = is_main ? concat([link_x, gs308_x], buck_x) : concat([in_x], buck_x);
+bx      = is_pp ? pp_x : buck_x;                          // buck / board centres
+pi_nx   = [for (x = bx) is_pp ? x + pp_out_dx : x];       // Pi cable notches
+notch_x = is_main ? concat([link_x, gs308_x], pi_nx) : concat([in_x], pi_nx);
+
+// pi-power board corner (front-left) for a board centred at x
+function pp_corner(x) = [x - pp_size[0] / 2, buck_y - pp_size[1] / 2];
 
 // ---------- front panel ----------
 module panel_2d() {
@@ -132,7 +150,11 @@ module tray() {
             cube([wall_t, tray_d, wall_h]);                                     // left wall
             translate([tray_w - wall_t, 0, 0]) cube([wall_t, tray_d, wall_h]);  // right wall
             translate([0, tray_d - wall_t, 0]) cube([tray_w, wall_t, wall_h]);  // rear wall
-            for (x = buck_x) translate([x, buck_y, 0]) pocket(buck_in);
+            if (is_pp) for (x = bx) {
+                c = pp_corner(x);
+                for (h = concat(pp_holes, pp_posts)) translate([c[0] + h[0], c[1] + h[1], 0])
+                    cylinder(d = pp_standoff_d, h = floor_t + pp_standoff_h);
+            } else for (x = bx) translate([x, buck_y, 0]) pocket(buck_in);
             translate([wago_pos[0], wago_pos[1], 0]) pocket(wago_in);
             if (is_main) translate([wago2_pos[0], wago2_pos[1], 0]) pocket(wago2_in);
         }
@@ -141,7 +163,10 @@ module tray() {
             translate([x - notch_w / 2, tray_d - wall_t - 1, wall_h - notch_depth])
                 cube([notch_w, wall_t + 2, notch_depth + 1]);
         // zip-tie slots
-        for (x = buck_x) zip_pair([x, buck_y], buck_in);
+        if (is_pp) for (x = bx) {  // heat-set insert holes in the front standoffs
+            c = pp_corner(x);
+            for (h = pp_holes) translate([c[0] + h[0], c[1] + h[1], 1]) cylinder(d = pp_insert_d, h = floor_t + pp_standoff_h);
+        } else for (x = bx) zip_pair([x, buck_y], buck_in);
         zip_pair(wago_pos, wago_in);
         if (is_main) {
             // rear DC input jack
