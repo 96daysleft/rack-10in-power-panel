@@ -1,14 +1,27 @@
-// 10-inch rack, 1U power panel: 3x Raspberry Pi 3B+ + Netgear GS308
+// 10-inch rack, 1U power panel for Raspberry Pi 3B+ nodes + Netgear GS308
 //
-// Power path:
-//   12 V brick -> rear DC jack -> inline 5 A fuse -> front rocker -> Wago 221
-//     -> GS308 barrel pigtail (12 V)
-//     -> 3x 12->5 V buck (one per Pi) -> micro-USB pigtails
+// Two roles share this file (set `role`):
+//
+//   main      12 V brick -> rear DC jack -> 5 A fuse -> front rocker -> Wago 221-415 + 221-413
+//               -> GS308 barrel pigtail (12 V)
+//               -> 3x 12->5 V buck -> micro-USB pigtails -> Pi 1-3
+//               -> 12 V link out (XT30 pigtail) -> expansion module
+//
+//   expansion XT30 link in -> (optional rocker) -> Wago 221-415
+//               -> 3x 12->5 V buck -> micro-USB pigtails -> Pi 4-6
+//             No fuse: the main module's 5 A fuse protects the whole chain.
+//             One 60 W brick is good for 6 Pi 3B+ total (main + one expansion).
+//
+// expansion-panel.scad is a wrapper that includes this file with role = "expansion".
 //
 // Print with the tray floor on the bed (front panel stands up), PETG preferred.
 // All dimensions in mm. Measure your actual parts and adjust the parameters.
 
 $fn = 48;
+
+/* [Module] */
+role             = "main"; // [main, expansion]
+expansion_rocker = true;   // expansion only: local on/off switch for its Pis
 
 /* [Rack] */
 panel_w   = 254;    // 10" front panel width
@@ -38,10 +51,12 @@ vent_pitch = 7;
 vent_h     = 26;
 
 /* [Rear wall cutouts] (x from the tray's left edge) */
-jack_d      = 12.2;   // panel-mount 5.5x2.1 jack, M12 body (8.2 for M8 type)
+jack_d      = 12.2;   // main: panel-mount 5.5x2.1 jack, M12 body (8.2 for M8 type)
 jack_x      = 20;
 jack_z      = 13;     // centre height; leaves room for the nut above the floor
-notch_x     = [58, 95, 135, 175]; // GS308 lead, Pi 1, Pi 2, Pi 3
+link_x      = 40;     // main: 12 V link-out pigtail notch
+gs308_x     = 58;     // main: GS308 barrel pigtail notch
+in_x        = 20;     // expansion: 12 V link-in pigtail notch
 notch_w     = 7;
 notch_depth = 12;     // open-top slots so pigtails drop in
 
@@ -51,12 +66,17 @@ buck_x      = [95, 135, 175];
 buck_y      = 35;
 wago_in     = [20.6, 19]; // Wago 221-415 footprint
 wago_pos    = [48, 35];
+wago2_in    = [14.2, 19]; // main: Wago 221-413 for the link-out tap
+wago2_pos   = [48, 62];
 pocket_h    = 5;
 pocket_wall = 1.6;
 zip_slot    = [4, 2];     // zip-tie slot through the floor
-fuse_pos    = [20, 62];   // inline fuse holder tie-down
+fuse_pos    = [20, 62];   // main: inline fuse holder tie-down
+relief_y    = 80;         // strain-relief zip ties in front of link notches
 
+is_main = role == "main";
 tray_x0 = (panel_w - tray_w) / 2;
+notch_x = is_main ? concat([link_x, gs308_x], buck_x) : concat([in_x], buck_x);
 
 // ---------- front panel ----------
 module panel_2d() {
@@ -68,7 +88,8 @@ module panel_2d() {
                 hull() for (dx = [-(slot_l - slot_w) / 2, (slot_l - slot_w) / 2])
                     translate([dx, 0]) circle(d = slot_w);
         // rocker switch
-        translate([rocker_x - rocker[0] / 2, panel_h / 2 - rocker[1] / 2]) square(rocker);
+        if (is_main || expansion_rocker)
+            translate([rocker_x - rocker[0] / 2, panel_h / 2 - rocker[1] / 2]) square(rocker);
         // power LED
         if (led_d > 0) translate([led_x, panel_h / 2]) circle(d = led_d);
         // vents
@@ -91,13 +112,18 @@ module pocket(inner) {
     }
 }
 
-module zip_slot_cut()
-    translate([-zip_slot[0] / 2, -zip_slot[1] / 2, -1]) cube([zip_slot[0], zip_slot[1], floor_t + 2]);
+module zip_slot_cut(s = zip_slot)
+    translate([-s[0] / 2, -s[1] / 2, -1]) cube([s[0], s[1], floor_t + 2]);
 
+// pair of slots either side of a pocket (tie runs across the module)
 module zip_pair(c, inner) {
     off = inner[1] / 2 + pocket_wall + 2.5;
     for (dy = [-off, off]) translate([c[0], c[1] + dy, 0]) zip_slot_cut();
 }
+
+// pair of slots either side of a cable running front-to-back (strain relief)
+module relief_pair(x)
+    for (dx = [-5, 5]) translate([x + dx, relief_y, 0]) zip_slot_cut([zip_slot[1], zip_slot[0]]);
 
 module tray() {
     translate([tray_x0, -0.5, 0]) difference() {
@@ -108,17 +134,24 @@ module tray() {
             translate([0, tray_d - wall_t, 0]) cube([tray_w, wall_t, wall_h]);  // rear wall
             for (x = buck_x) translate([x, buck_y, 0]) pocket(buck_in);
             translate([wago_pos[0], wago_pos[1], 0]) pocket(wago_in);
+            if (is_main) translate([wago2_pos[0], wago2_pos[1], 0]) pocket(wago2_in);
         }
-        // rear DC input jack
-        translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
-        // cable exit notches
+        // cable exit notches (open from the top)
         for (x = notch_x)
             translate([x - notch_w / 2, tray_d - wall_t - 1, wall_h - notch_depth])
                 cube([notch_w, wall_t + 2, notch_depth + 1]);
         // zip-tie slots
         for (x = buck_x) zip_pair([x, buck_y], buck_in);
         zip_pair(wago_pos, wago_in);
-        for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
+        if (is_main) {
+            // rear DC input jack
+            translate([jack_x, tray_d + 1, jack_z]) rotate([90, 0, 0]) cylinder(d = jack_d, h = wall_t + 2);
+            zip_pair(wago2_pos, wago2_in);
+            for (dy = [-6, 6]) translate([fuse_pos[0], fuse_pos[1] + dy, 0]) zip_slot_cut();
+            relief_pair(link_x);
+        } else {
+            relief_pair(in_x);
+        }
     }
 }
 

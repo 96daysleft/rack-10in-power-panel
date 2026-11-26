@@ -36,4 +36,28 @@ Prices are rough USD estimates (late 2026) and vary by vendor.
 - A soldering iron
 - Wire strippers, and crimpers if you use ferrules
 
-**Estimated total:** about $40–55 plus filament.
+**Estimated total (main module):** about $40–55 plus filament.
+
+## Main module additions for the link-out
+
+| Qty | Part | Notes | ~Cost |
+|---|---|---|---|
+| 1 | Wago 221-413 (3-port) | +12 V tap for the link-out. A matching GND connector is also needed. | $2 |
+| 1 | XT30 female pigtail, 18 AWG | Link out, through the rear notch with zip-tie strain relief | $2 |
+
+## Expansion module (Pi 4–6, same brick)
+
+| Qty | Part | Notes | ~Cost |
+|---|---|---|---|
+| 3 | 12 V→5 V buck converter, ≥3 A | Same as the main module | $3–15 total |
+| 3 | Micro-USB male power pigtails | 10–15 cm | $5 |
+| 1 | XT30 male pigtail, 18 AWG | Link in | $2 |
+| 1 | 18 AWG jumper, under 30 cm, XT30 on both ends | Panel 1 to panel 2. Or join the two pigtails directly. | $2 |
+| 2 | Wago 221-415 | One each for +12 V and GND | $5 |
+| 1 | KCD1 rocker switch (optional) | Local on/off for Pi 4–6 | $1 |
+| 1 | Printed panel + tray (`cad/expansion-panel.scad`) | | — |
+| 4 | Rack screws + cage nuts | | — |
+
+No brick and no fuse: the expansion panel runs from the main module's brick and 5 A fuse. **One 60 W brick handles 6 Pi 3B+ total.**
+
+**Estimated total (expansion):** about $20–30 plus filament.
