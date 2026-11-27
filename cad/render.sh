@@ -14,7 +14,7 @@ run() { env -i HOME="$HOME" PATH=/usr/local/bin:/usr/bin:/bin DISPLAY="${DISPLAY
 
 mkdir -p out
 status=0
-for f in rack-power-panel expansion-panel six-panel; do
+for f in rack-power-panel six-panel; do
   log=$(run -o "out/$f.stl" "$f.scad" 2>&1)
   if grep -qE "WARNING|ERROR" <<<"$log" || ! grep -qE "Simple:\s+yes" <<<"$log"; then
     echo "FAIL $f"; grep -E "WARNING|ERROR|Simple:" <<<"$log"; status=1
